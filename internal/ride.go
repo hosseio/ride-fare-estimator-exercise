@@ -11,7 +11,7 @@ type Ride struct {
 var ErrInvalidRideID = errors.New("invalid ride ID")
 
 func NewRide(id int) (Ride, error) {
-	if id <= 0 {
+	if id <= 1 {
 		return Ride{}, ErrInvalidRideID
 	}
 
@@ -37,12 +37,10 @@ func (r Ride) ID() int {
 	return r.id
 }
 
-type Memento struct {
-	ID              int
-	Segments        SegmentList
-	CurrentPosition Position
+func (r Ride) CurrentPosition() Position {
+	return r.currentPosition
 }
 
-func RestoreState(state Memento) Ride {
-	return Ride{state.ID, state.Segments, state.CurrentPosition}
+func (r Ride) Segments() SegmentList {
+	return r.segments
 }
