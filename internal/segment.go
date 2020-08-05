@@ -37,12 +37,8 @@ func (s Segment) DistanceCovered() float64 {
 const maxSpeed = 100
 
 var ErrTooMuchSpeed = errors.New("to much speed to create the segment")
-var ErrDifferentRides = errors.New("positions of different rides creating the segment")
 
 func NewSegmentFromPositions(initialPosition Position, endPosition Position) (Segment, error) {
-	if initialPosition.RideID() != endPosition.RideID() {
-		return Segment{}, ErrDifferentRides
-	}
 	distance := distanceInMeters(initialPosition, endPosition)
 	duration := initialPosition.Date().Sub(endPosition.Date())
 	if endPosition.Date().After(initialPosition.Date()) {
@@ -86,4 +82,14 @@ func distanceInMeters(position Position, position2 Position) float64 {
 	)
 
 	return km * kmToM
+}
+
+type SegmentList []Segment
+
+func (l *SegmentList) Add(segment Segment) {
+	*l = append(*l, segment)
+}
+
+func (l SegmentList) Len() int {
+	return len([]Segment(l))
 }

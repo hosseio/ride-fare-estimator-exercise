@@ -97,24 +97,12 @@ func Test_distanceInMeters(t *testing.T) {
 
 func TestNewSegmentFromPositions(t *testing.T) {
 	assertThat := require.New(t)
-	t.Run("Given 2 positions from different rides", func(t *testing.T) {
-		now := time.Now()
-		p1, _ := NewPosition(1, 37.5702221, -5.9412794, now.Unix())
-		p2, _ := NewPosition(2, 37.888339, -4.779336, now.Unix())
-		t.Run("When the segment is created", func(t *testing.T) {
-			_, err := NewSegmentFromPositions(p1, p2)
-			t.Run("Then an error is returned", func(t *testing.T) {
-				assertThat.Error(err)
-				assertThat.Equal(ErrDifferentRides, err)
-			})
-		})
-	})
 	t.Run("Given 2 positions in two moments indicating a speed greater than 100 km per hour", func(t *testing.T) {
 		now := time.Now()
 		oneHourAgo := now.Add(-1 * time.Hour)
 		// about 108 km made in one hour
-		p1, _ := NewPosition(1, 37.5702221, -5.9412794, oneHourAgo.Unix())
-		p2, _ := NewPosition(1, 37.888339, -4.779336, now.Unix())
+		p1, _ := NewPosition(37.5702221, -5.9412794, oneHourAgo.Unix())
+		p2, _ := NewPosition(37.888339, -4.779336, now.Unix())
 		t.Run("When the segment is created", func(t *testing.T) {
 			_, err := NewSegmentFromPositions(p1, p2)
 			t.Run("Then an error is returned", func(t *testing.T) {
@@ -127,8 +115,8 @@ func TestNewSegmentFromPositions(t *testing.T) {
 		now := time.Now()
 		oneHourAgo := now.Add(-2 * time.Hour)
 		// about 108 km made in two hours
-		p1, _ := NewPosition(1, 37.5702221, -5.9412794, oneHourAgo.Unix())
-		p2, _ := NewPosition(1, 37.888339, -4.779336, now.Unix())
+		p1, _ := NewPosition(37.5702221, -5.9412794, oneHourAgo.Unix())
+		p2, _ := NewPosition(37.888339, -4.779336, now.Unix())
 		t.Run("When the segment is created", func(t *testing.T) {
 			_, err := NewSegmentFromPositions(p1, p2)
 			t.Run("Then an error is returned", func(t *testing.T) {

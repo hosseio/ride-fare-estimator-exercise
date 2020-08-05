@@ -1,7 +1,6 @@
 package internal
 
 import (
-	"errors"
 	"time"
 )
 
@@ -12,10 +11,7 @@ const (
 	maxLon = 180
 )
 
-var ErrInvalidRideID = errors.New("invalid ride ID")
-
 type Position struct {
-	rideID      int
 	coordinates Coordinates
 	date        time.Time
 }
@@ -26,10 +22,6 @@ func (p Position) Date() time.Time {
 
 func (p Position) Coordinates() Coordinates {
 	return p.coordinates
-}
-
-func (p Position) RideID() int {
-	return p.rideID
 }
 
 type Coordinates struct {
@@ -45,18 +37,14 @@ func (c Coordinates) Lat() float64 {
 	return c.lat
 }
 
-func NewPosition(rideID int, lat float64, lon float64, timestamp int64) (Position, error) {
-	if rideID <= 0 {
-		return Position{}, ErrInvalidRideID
-	}
+func NewPosition(lat float64, lon float64, timestamp int64) (Position, error) {
 	coordinates, err := NewCoordinates(lat, lon)
 	if err != nil {
 		return Position{}, err
 	}
 	date := time.Unix(timestamp, 0)
 
-	return Position{rideID: rideID, coordinates: coordinates, date: date}, nil
-
+	return Position{coordinates: coordinates, date: date}, nil
 }
 
 func NewCoordinates(lat float64, lon float64) (Coordinates, error) {
