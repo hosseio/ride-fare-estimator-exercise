@@ -18,11 +18,11 @@ func TestInMemoryRideRepository(t *testing.T) {
 			now := time.Now()
 			start := now.Add(-1 * time.Hour)
 			p1, _ := internal.NewPosition(37.389098, -5.984379, start.Unix())
-			ride.AddPosition(p1)
+			_ = ride.AddPosition(p1)
 			p3, _ := internal.NewPosition(37.389277, -5.984701, start.Add(5*time.Second).Unix())
-			ride.AddPosition(p3)
+			_ = ride.AddPosition(p3)
 			p4, _ := internal.NewPosition(37.389391, -5.985022, start.Add(10*time.Second).Unix())
-			ride.AddPosition(p4)
+			_ = ride.AddPosition(p4)
 
 			err := sut.Save(ride)
 			t.Run("Then it can be retrieved by id", func(t *testing.T) {

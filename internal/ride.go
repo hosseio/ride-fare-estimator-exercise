@@ -18,19 +18,21 @@ func NewRide(id int) (Ride, error) {
 	return Ride{id: id}, nil
 }
 
-func (r *Ride) AddPosition(position Position) {
+func (r *Ride) AddPosition(position Position) error {
 	if r.currentPosition == (Position{}) {
 		r.currentPosition = position
-		return
+		return nil
 	}
 
 	segment, err := NewSegmentFromPositions(r.currentPosition, position)
 	if err != nil {
-		return
+		return err
 	}
 
 	r.segments.Add(segment)
 	r.currentPosition = position
+
+	return nil
 }
 
 func (r Ride) ID() int {

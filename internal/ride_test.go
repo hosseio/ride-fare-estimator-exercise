@@ -13,16 +13,26 @@ func TestRide_AddPosition(t *testing.T) {
 		t.Run("When adding 5 positions with only 3 valid segments", func(t *testing.T) {
 			now := time.Now()
 			start := now.Add(-1 * time.Hour)
+
 			p1, _ := NewPosition(37.389098, -5.984379, start.Unix())
-			ride.AddPosition(p1)
+			err := ride.AddPosition(p1)
+			assertThat.NoError(err)
+
 			p2, _ := NewPosition(37.888339, -4.779336, now.Unix())
-			ride.AddPosition(p2) // about 108km make in one hour: this one should be avoided
+			err = ride.AddPosition(p2) // about 108km make in one hour: this one should be avoided
+			assertThat.Equal(ErrTooMuchSpeed, err)
+
 			p3, _ := NewPosition(37.389277, -5.984701, start.Add(5*time.Second).Unix())
-			ride.AddPosition(p3)
+			err = ride.AddPosition(p3)
+			assertThat.NoError(err)
+
 			p4, _ := NewPosition(37.389391, -5.985022, start.Add(10*time.Second).Unix())
-			ride.AddPosition(p4)
+			err = ride.AddPosition(p4)
+			assertThat.NoError(err)
+
 			p5, _ := NewPosition(37.356303, -5.981766, start.Add(11*time.Second).Unix())
-			ride.AddPosition(p5) // about 4km in 1 second: this one should be avoided
+			err = ride.AddPosition(p5) // about 4km in 1 second: this one should be avoided
+			assertThat.Equal(ErrTooMuchSpeed, err)
 
 			t.Run("Then the final ride has 2 segments", func(t *testing.T) {
 				assertThat.Equal(2, ride.segments.Len())
