@@ -30,8 +30,10 @@ type CSVReader struct {
 	filepath string
 }
 
-func NewCSVReader(demuxer *Demuxer, filepath string) CSVReader {
-	return CSVReader{demuxer: demuxer, filepath: filepath}
+type CSVFilepath string
+
+func NewCSVReader(demuxer *Demuxer, filepath CSVFilepath) CSVReader {
+	return CSVReader{demuxer: demuxer, filepath: string(filepath)}
 }
 
 func (r CSVReader) Read(ctx context.Context) error {

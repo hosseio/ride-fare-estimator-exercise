@@ -1,8 +1,9 @@
 package storage
 
 import (
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
 	"sync"
+
+	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
 )
 
 type InMemoryRideRepository struct {
@@ -10,8 +11,8 @@ type InMemoryRideRepository struct {
 	rides map[int]internal.Ride
 }
 
-func NewInMemoryRideRepository() InMemoryRideRepository {
-	return InMemoryRideRepository{
+func NewInMemoryRideRepository() *InMemoryRideRepository {
+	return &InMemoryRideRepository{
 		rides: make(map[int]internal.Ride),
 	}
 }
