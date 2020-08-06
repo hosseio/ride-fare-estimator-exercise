@@ -10,6 +10,7 @@ import (
 	"github.com/chiguirez/cromberbus/v2"
 	"github.com/google/wire"
 	"github.com/hosseio/ride-fare-estimator-exercise/internal/creator"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal/reader"
 	"github.com/hosseio/ride-fare-estimator-exercise/internal/storage"
 	"github.com/hosseio/ride-fare-estimator-exercise/io"
 )
@@ -25,7 +26,7 @@ func initCSVReader(ctx context.Context, cfg Config) (io.CSVReader, error) {
 
 func initController(ctx context.Context, cfg Config) (io.Controller, error) {
 	ioDemuxer := getDemuxer(ctx, cfg)
-	inMemory := storage.NewInMemory()
+	inMemory := getInMemoryStorage()
 	createPositionCommandHandler := creator.NewCreatePositionCommandHandler(inMemory)
 	commandBus, err := getBus(createPositionCommandHandler)
 	if err != nil {
@@ -35,15 +36,39 @@ func initController(ctx context.Context, cfg Config) (io.Controller, error) {
 	return controller, nil
 }
 
+func initCSVWriter(ctx context.Context, cfg Config) (io.CSVWriter, error) {
+	inMemory := getInMemoryStorage()
+	fareRetriever := reader.NewFareRetriever(inMemory)
+	csvOutFilepath := getCSVOutputFilepath(cfg)
+	csvWriter := io.NewCSVWriter(fareRetriever, csvOutFilepath)
+	return csvWriter, nil
+}
+
 // wire.go:
 
 var creatorSet = wire.NewSet(creator.NewCreatePositionCommandHandler)
 
-var storageSet = wire.NewSet(storage.NewInMemory)
+var storageSet = wire.NewSet(
+	getInMemoryStorage,
+)
+
+var inMemStorage *storage.InMemory
+
+func getInMemoryStorage() *storage.InMemory {
+	if inMemStorage != nil {
+		return inMemStorage
+	}
+
+	inMemStorage = storage.NewInMemory()
+
+	return inMemStorage
+}
 
 var ioSet = wire.NewSet(io.NewController, io.NewCSVReader, getDemuxer,
-	getCSVFilepath,
+	getCSVFilepath, io.NewCSVWriter, getCSVOutputFilepath,
 )
+
+var readerSet = wire.NewSet(reader.NewFareRetriever)
 
 var demuxer *io.Demuxer
 
@@ -59,6 +84,10 @@ func getDemuxer(ctx context.Context, cfg Config) *io.Demuxer {
 
 func getCSVFilepath(cfg Config) io.CSVFilepath {
 	return io.CSVFilepath(cfg.CSV.InputFilepath)
+}
+
+func getCSVOutputFilepath(cfg Config) io.CSVOutFilepath {
+	return io.CSVOutFilepath(cfg.CSV.OutputFilepath)
 }
 
 var bus cromberbus.CommandBus

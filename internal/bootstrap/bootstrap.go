@@ -14,6 +14,11 @@ type Config struct {
 }
 
 func Run(ctx context.Context, cfg Config) error {
+	writer, err := initCSVWriter(ctx, cfg)
+	if err != nil {
+		return err
+	}
+
 	cCtx, cancelFn := context.WithCancel(ctx)
 	g, gCtx := errgroup.WithContext(cCtx)
 
@@ -40,7 +45,5 @@ func Run(ctx context.Context, cfg Config) error {
 		return err
 	}
 
-	// TODO write output
-
-	return nil
+	return writer.Write(ctx)
 }
