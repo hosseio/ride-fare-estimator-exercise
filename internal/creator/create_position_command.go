@@ -1,6 +1,9 @@
 package creator
 
-import "gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
+import (
+	"errors"
+	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
+)
 
 type CreatePositionCommand struct {
 	RideID    int
@@ -20,7 +23,7 @@ func NewCreatePositionCommandHandler(repository internal.RideRepository) CreateP
 func (h CreatePositionCommandHandler) Handle(command CreatePositionCommand) error {
 	ride, err := h.repository.Get(command.RideID)
 	if err != nil {
-		if err != internal.ErrRideNotFound {
+		if !errors.Is(err, internal.ErrRideNotFound) {
 			return err
 		}
 		ride, err = internal.NewRide(command.RideID)
@@ -36,7 +39,7 @@ func (h CreatePositionCommandHandler) Handle(command CreatePositionCommand) erro
 
 	err = ride.AddPosition(position)
 	if err != nil {
-		if err != internal.ErrTooMuchSpeed {
+		if !errors.Is(err, internal.ErrTooMuchSpeed) {
 			return err
 		}
 
