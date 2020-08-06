@@ -16,12 +16,13 @@ func TestCreatePositionCommandHandler(t *testing.T) {
 		sut := NewCreatePositionCommandHandler(repository)
 		var saveCalls int
 
+		now := time.Now()
 		t.Run("When adding a position of a non existence ride", func(t *testing.T) {
 			command := CreatePositionCommand{
 				RideID:    42,
 				Lat:       1,
 				Lon:       1,
-				Timestamp: time.Now().Unix(),
+				Timestamp: now.Unix(),
 			}
 
 			repository.GetFunc = func(id int) (internal.Ride, error) {
@@ -43,7 +44,7 @@ func TestCreatePositionCommandHandler(t *testing.T) {
 
 		t.Run("When adding a position creating a segment of an existence ride", func(t *testing.T) {
 			ride, _ := internal.NewRide(42)
-			p1, _ := internal.NewPosition(37.389098, -5.984379, time.Now().Add(5*time.Second).Unix())
+			p1, _ := internal.NewPosition(37.389098, -5.984379, now.Add(-5*time.Second).Unix())
 			_ = ride.AddPosition(p1)
 
 			command := CreatePositionCommand{
@@ -51,7 +52,7 @@ func TestCreatePositionCommandHandler(t *testing.T) {
 				// the following is a few meters in 5 seconds
 				Lat:       37.389277,
 				Lon:       -5.984701,
-				Timestamp: time.Now().Unix(),
+				Timestamp: now.Unix(),
 			}
 
 			repository.GetFunc = func(id int) (internal.Ride, error) {
@@ -74,7 +75,7 @@ func TestCreatePositionCommandHandler(t *testing.T) {
 		})
 		t.Run("When adding a position to be ignored", func(t *testing.T) {
 			ride, _ := internal.NewRide(42)
-			p1, _ := internal.NewPosition(37.389098, -5.984379, time.Now().Add(5*time.Second).Unix())
+			p1, _ := internal.NewPosition(37.389098, -5.984379, now.Add(-5*time.Second).Unix())
 			_ = ride.AddPosition(p1)
 
 			command := CreatePositionCommand{
@@ -82,7 +83,7 @@ func TestCreatePositionCommandHandler(t *testing.T) {
 				// the following is a few kms in 5 seconds: too much speed => ignore new position
 				Lat:       37.888339,
 				Lon:       -4.779336,
-				Timestamp: time.Now().Unix(),
+				Timestamp: now.Unix(),
 			}
 
 			repository.GetFunc = func(id int) (internal.Ride, error) {

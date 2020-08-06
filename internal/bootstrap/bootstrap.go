@@ -2,6 +2,7 @@ package bootstrap
 
 import (
 	"context"
+	"errors"
 
 	"golang.org/x/sync/errgroup"
 )
@@ -13,7 +14,22 @@ type Config struct {
 	} `mapstructure:"csv"`
 }
 
+func (c Config) Validate() error {
+	if c.CSV.InputFilepath == "" {
+		return errors.New("missing input filepath variable")
+	}
+	if c.CSV.OutputFilepath == "" {
+		return errors.New("missing output filepath variable")
+	}
+
+	return nil
+}
+
 func Run(ctx context.Context, cfg Config) error {
+	err := cfg.Validate()
+	if err != nil {
+		return err
+	}
 	writer, err := initCSVWriter(ctx, cfg)
 	if err != nil {
 		return err

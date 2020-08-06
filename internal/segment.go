@@ -2,7 +2,6 @@ package internal
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/umahmood/haversine"
@@ -57,11 +56,11 @@ func (s Segment) Fare() float64 {
 }
 
 var ErrTooMuchSpeed = errors.New("too much speed to create the segment")
-var ErrInvalidPositionTimes = errors.New("the end position cannot be before the initial one. %v %v")
+var ErrInvalidPositionTimes = errors.New("the end position cannot be before the initial one")
 
 func NewSegmentFromPositions(initialPosition Position, endPosition Position) (Segment, error) {
 	if initialPosition.Date().After(endPosition.Date()) {
-		return Segment{}, fmt.Errorf("the end position cannot be before the initial one. %v %v", initialPosition.Date().Unix(), endPosition.Date().Unix())
+		return Segment{}, ErrInvalidPositionTimes
 	}
 	distance := distanceInMeters(initialPosition, endPosition)
 	duration := endPosition.Date().Sub(initialPosition.Date())

@@ -19,7 +19,7 @@ func TestE2E(t *testing.T) {
 	var cfg bootstrap.Config
 	ctx := context.Background()
 	setup := func() {
-		cfg.CSV.InputFilepath = "e2e_file.csv"
+		cfg.CSV.InputFilepath = "paths.csv"
 		cfg.CSV.OutputFilepath = "e2e_output.csv"
 
 		bootstrap.Run(ctx, cfg)
@@ -28,7 +28,7 @@ func TestE2E(t *testing.T) {
 		_ = os.Remove(cfg.CSV.OutputFilepath)
 	}
 	t.Run("Given a csv file with positions of 9 rides (id 1-9) to be read", func(t *testing.T) {
-		// e2e_file.csv
+		// paths.csv
 		t.Run("When the system is running", func(t *testing.T) {
 			setup()
 			defer tearDown()
