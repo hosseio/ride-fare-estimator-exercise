@@ -64,9 +64,7 @@ func (r CSVReader) Read(ctx context.Context) error {
 				continue
 			}
 
-			output := r.demuxer.Demux(positionDTO.RideID)
-
-			output <- *positionDTO
+			r.demuxer.Demux(*positionDTO)
 		}
 	}
 	r.demuxer.close()

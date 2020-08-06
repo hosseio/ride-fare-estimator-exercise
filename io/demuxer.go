@@ -16,10 +16,10 @@ func NewDemuxer() Demuxer {
 	return Demuxer{inputs: inputs}
 }
 
-func (d Demuxer) Demux(id int) chan (PositionDTO) {
-	chanPosition := id % 10
+func (d Demuxer) Demux(dto PositionDTO) {
+	chanPosition := dto.RideID % 10
 
-	return d.inputs[chanPosition]
+	d.inputs[chanPosition] <- dto
 }
 
 func (d Demuxer) close() {
