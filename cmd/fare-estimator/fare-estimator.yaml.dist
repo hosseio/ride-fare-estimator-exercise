@@ -1,0 +1,3 @@
+csv:
+  input_filepath: paths.csv
+  output_filepath: fares.csv

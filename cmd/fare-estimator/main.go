@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 
+	"github.com/hosseio/ride-fare-estimator-exercise/internal/bootstrap"
+
 	"github.com/chiguirez/snout"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal/bootstrap"
 )
 
 func main() {

@@ -5,13 +5,13 @@ package bootstrap
 import (
 	"context"
 
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal"
 
 	cromberbus "github.com/chiguirez/cromberbus/v2"
 	"github.com/google/wire"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal/creator"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal/storage"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/io"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal/creator"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal/storage"
+	"github.com/hosseio/ride-fare-estimator-exercise/io"
 )
 
 var creatorSet = wire.NewSet(
@@ -19,7 +19,7 @@ var creatorSet = wire.NewSet(
 )
 
 var storageSet = wire.NewSet(
-	storage.NewInMemoryRideRepository,
+	storage.NewInMemory,
 )
 
 var ioSet = wire.NewSet(
@@ -72,7 +72,7 @@ func initController(ctx context.Context, cfg Config) (io.Controller, error) {
 		ioSet,
 		creatorSet,
 		storageSet,
-		wire.Bind(new(internal.RideRepository), new(*storage.InMemoryRideRepository)),
+		wire.Bind(new(internal.RideRepository), new(*storage.InMemory)),
 		getBus,
 	)
 

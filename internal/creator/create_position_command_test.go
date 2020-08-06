@@ -1,10 +1,11 @@
 package creator
 
 import (
-	"github.com/stretchr/testify/require"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
 	"testing"
 	"time"
+
+	"github.com/hosseio/ride-fare-estimator-exercise/internal"
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreatePositionCommandHandler(t *testing.T) {

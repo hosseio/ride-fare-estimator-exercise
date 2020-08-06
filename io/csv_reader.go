@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -47,57 +48,55 @@ func (r CSVReader) Read(ctx context.Context) error {
 		line []string
 	)
 
-	for err == nil {
+	defer r.demuxer.close()
+
+	for {
 		select {
 		case <-ctx.Done():
-			break
+			return nil
 		default:
 			line, err = reader.Read()
 			if err != nil {
 				if !errors.Is(io.EOF, err) {
 					log.Printf("error reading the csv file: %s", err.Error())
 				}
-				break
+				return nil
 			}
-			positionDTO := r.parseLine(line)
-			if positionDTO == nil {
+			positionDTO, err := r.parseLine(line)
+			if err != nil {
+				log.Println(err.Error())
 				continue
 			}
-
-			r.demuxer.Demux(*positionDTO)
+			r.demuxer.Demux(positionDTO)
 		}
 	}
-	r.demuxer.close()
-
-	return err
 }
 
-func (r CSVReader) parseLine(line []string) *PositionDTO {
+func (r CSVReader) parseLine(line []string) (PositionDTO, error) {
 	rideID, err := strconv.Atoi(line[indexID])
 	if err != nil {
-		log.Printf("cannot parse rideID: %s. %s", line[indexID], err.Error())
-		return nil
-	}
-	lat, err := strconv.ParseFloat(line[indexLat], 64)
-	if err != nil {
-		log.Printf("cannot parse Lat: %s. %s", line[indexLat], err.Error())
-		return nil
-	}
-	lon, err := strconv.ParseFloat(line[indexLon], 64)
-	if err != nil {
-		log.Printf("cannot parse Lon: %s. %s", line[indexLon], err.Error())
-		return nil
-	}
-	timestamp, err := strconv.ParseInt(line[indexTimestamp], 10, 64)
-	if err != nil {
-		log.Printf("cannot parse timestamp: %s. %s", line[indexTimestamp], err.Error())
-		return nil
+		return PositionDTO{}, fmt.Errorf("cannot parse rideID: %s. %w", line[indexID], err)
 	}
 
-	return &PositionDTO{
+	lat, err := strconv.ParseFloat(line[indexLat], 64)
+	if err != nil {
+		return PositionDTO{}, fmt.Errorf("cannot parse Lat: %s. %w", line[indexLat], err)
+	}
+
+	lon, err := strconv.ParseFloat(line[indexLon], 64)
+	if err != nil {
+		return PositionDTO{}, fmt.Errorf("cannot parse Lon: %s. %w", line[indexLon], err)
+	}
+
+	timestamp, err := strconv.ParseInt(line[indexTimestamp], 10, 64)
+	if err != nil {
+		return PositionDTO{}, fmt.Errorf("cannot parse timestamp: %s. %w", line[indexTimestamp], err)
+	}
+
+	return PositionDTO{
 		RideID:    rideID,
 		Lat:       lat,
 		Lon:       lon,
 		Timestamp: timestamp,
-	}
+	}, nil
 }

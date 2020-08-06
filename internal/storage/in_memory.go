@@ -6,18 +6,18 @@ import (
 	"github.com/hosseio/ride-fare-estimator-exercise/internal"
 )
 
-type InMemoryRideRepository struct {
+type InMemory struct {
 	sync.RWMutex
 	rides map[int]internal.Ride
 }
 
-func NewInMemoryRideRepository() *InMemoryRideRepository {
-	return &InMemoryRideRepository{
+func NewInMemory() *InMemory {
+	return &InMemory{
 		rides: make(map[int]internal.Ride),
 	}
 }
 
-func (r *InMemoryRideRepository) Get(id int) (internal.Ride, error) {
+func (r *InMemory) Get(id int) (internal.Ride, error) {
 	r.RLock()
 	defer r.RUnlock()
 	ride := r.rides[id]
@@ -29,11 +29,23 @@ func (r *InMemoryRideRepository) Get(id int) (internal.Ride, error) {
 	return ride, nil
 }
 
-func (r *InMemoryRideRepository) Save(ride internal.Ride) error {
+func (r *InMemory) Save(ride internal.Ride) error {
 	r.RLock()
 	defer r.RUnlock()
 
 	r.rides[ride.ID()] = ride
 
 	return nil
+}
+
+func (r *InMemory) All() ([]internal.Ride, error) {
+	r.RLock()
+	defer r.RUnlock()
+
+	var rides []internal.Ride
+	for _, r := range r.rides {
+		rides = append(rides, r)
+	}
+
+	return rides, nil
 }

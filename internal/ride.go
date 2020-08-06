@@ -1,6 +1,9 @@
 package internal
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 type Ride struct {
 	id              int
@@ -11,8 +14,8 @@ type Ride struct {
 var ErrInvalidRideID = errors.New("invalid ride ID")
 
 func NewRide(id int) (Ride, error) {
-	if id <= 1 {
-		return Ride{}, ErrInvalidRideID
+	if id <= 0 {
+		return Ride{}, fmt.Errorf("invalid ride ID %v", id)
 	}
 
 	return Ride{id: id}, nil
@@ -45,4 +48,13 @@ func (r Ride) CurrentPosition() Position {
 
 func (r Ride) Segments() SegmentList {
 	return r.segments
+}
+
+func (r Ride) FareEstimation() float64 {
+	var total float64
+	for _, segment := range r.Segments() {
+		total = total + segment.Fare()
+	}
+
+	return total
 }

@@ -14,23 +14,33 @@ type Config struct {
 }
 
 func Run(ctx context.Context, cfg Config) error {
-	g, ctx := errgroup.WithContext(ctx)
+	cCtx, cancelFn := context.WithCancel(ctx)
+	g, gCtx := errgroup.WithContext(cCtx)
 
-	controller, err := initController(ctx, cfg)
+	controller, err := initController(gCtx, cfg)
 	if err != nil {
 		return err
 	}
 	g.Go(func() error {
-		return controller.Start(ctx)
+		return controller.Start(gCtx)
 	})
 
-	csvReader, err := initCSVReader(ctx, cfg)
+	csvReader, err := initCSVReader(gCtx, cfg)
 	if err != nil {
 		return err
 	}
 	g.Go(func() error {
-		return csvReader.Read(ctx)
+		err := csvReader.Read(gCtx)
+		cancelFn()
+		return err
 	})
 
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		return err
+	}
+
+	// TODO write output
+
+	return nil
 }

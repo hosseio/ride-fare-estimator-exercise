@@ -1,9 +1,10 @@
 package internal
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_distanceInMeters(t *testing.T) {
@@ -95,8 +96,21 @@ func Test_distanceInMeters(t *testing.T) {
 	}
 }
 
-func TestNewSegmentFromPositions(t *testing.T) {
+func TestSegment(t *testing.T) {
 	assertThat := require.New(t)
+	t.Run("Given and ending position before the initial one", func(t *testing.T) {
+		now := time.Now()
+		oneHourAgo := now.Add(-1 * time.Hour)
+		p1, _ := NewPosition(37.5702221, -5.9412794, now.Unix())
+		p2, _ := NewPosition(37.888339, -4.779336, oneHourAgo.Unix())
+		t.Run("When the segment is created", func(t *testing.T) {
+			_, err := NewSegmentFromPositions(p1, p2)
+			t.Run("Then an error is returned", func(t *testing.T) {
+				assertThat.Error(err)
+				assertThat.Equal(ErrInvalidPositionTimes, err)
+			})
+		})
+	})
 	t.Run("Given 2 positions in two moments indicating a speed greater than 100 km per hour", func(t *testing.T) {
 		now := time.Now()
 		oneHourAgo := now.Add(-1 * time.Hour)
@@ -113,14 +127,30 @@ func TestNewSegmentFromPositions(t *testing.T) {
 	})
 	t.Run("Given 2 positions in two moments indicating a speed lower than 100 km per hour", func(t *testing.T) {
 		now := time.Now()
-		oneHourAgo := now.Add(-2 * time.Hour)
+		twoHoursAgo := now.Add(-2 * time.Hour)
 		// about 108 km made in two hours
-		p1, _ := NewPosition(37.5702221, -5.9412794, oneHourAgo.Unix())
+		p1, _ := NewPosition(37.5702221, -5.9412794, twoHoursAgo.Unix())
 		p2, _ := NewPosition(37.888339, -4.779336, now.Unix())
 		t.Run("When the segment is created", func(t *testing.T) {
 			_, err := NewSegmentFromPositions(p1, p2)
 			t.Run("Then an error is returned", func(t *testing.T) {
 				assertThat.NoError(err)
+			})
+		})
+	})
+	t.Run("Given 2 positions for a moving segment about 1km and daytime", func(t *testing.T) {
+		now := time.Now()
+		initial := now.Add(-60 * time.Second)
+		// about 108 km made in two hours
+		p1, _ := NewPosition(52.363474, 4.875790, initial.Unix())
+		p2, _ := NewPosition(52.359490, 4.862186, now.Unix())
+		t.Run("When the segment is created", func(t *testing.T) {
+			segment, err := NewSegmentFromPositions(p1, p2)
+			t.Run("Then it is created", func(t *testing.T) {
+				assertThat.NoError(err)
+			})
+			t.Run("And the fare is properly calculated", func(t *testing.T) {
+				assertThat.Equal(0.7581297761001123, segment.fare)
 			})
 		})
 	})

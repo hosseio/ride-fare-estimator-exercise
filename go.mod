@@ -1,4 +1,4 @@
-module gitlab.emobg.tech/go/one-connected-fleet/Collision
+module github.com/hosseio/ride-fare-estimator-exercise
 
 go 1.14
 

@@ -13,7 +13,7 @@ import (
 func TestInMemoryRideRepository(t *testing.T) {
 	assertThat := require.New(t)
 	t.Run("Given an in memory ride repository", func(t *testing.T) {
-		sut := NewInMemoryRideRepository()
+		sut := NewInMemory()
 		t.Run("When a ride with 2 segments is saved", func(t *testing.T) {
 			ride, _ := internal.NewRide(42)
 			now := time.Now()

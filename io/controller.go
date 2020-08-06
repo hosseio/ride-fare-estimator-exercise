@@ -5,7 +5,7 @@ import (
 	"log"
 
 	cromberbus "github.com/chiguirez/cromberbus/v2"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal/creator"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal/creator"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -22,26 +22,33 @@ func (c Controller) Start(ctx context.Context) error {
 	g, gCtx := errgroup.WithContext(ctx)
 
 	for _, ch := range c.demuxer.inputs {
-		g.Go(func() error {
-			for {
-				select {
-				case <-gCtx.Done():
-					break
-				case position := <-ch:
-					err := c.bus.Dispatch(creator.CreatePositionCommand{
-						RideID:    position.RideID,
-						Lat:       position.Lat,
-						Lon:       position.Lon,
-						Timestamp: position.Timestamp,
-					})
-
-					log.Printf("error creating position: %s", err.Error())
-				}
-			}
-
-			return nil
-		})
+		g.Go(c.listen(gCtx, ch))
 	}
 
 	return g.Wait()
+}
+
+func (c Controller) listen(ctx context.Context, ch chan PositionDTO) func() error {
+	return func() error {
+		for {
+			select {
+			case <-ctx.Done():
+				return nil
+			case position, ok := <-ch:
+				if !ok {
+					break
+				}
+				err := c.bus.Dispatch(creator.CreatePositionCommand{
+					RideID:    position.RideID,
+					Lat:       position.Lat,
+					Lon:       position.Lon,
+					Timestamp: position.Timestamp,
+				})
+
+				if err != nil {
+					log.Printf("error creating position: %s", err.Error())
+				}
+			}
+		}
+	}
 }
