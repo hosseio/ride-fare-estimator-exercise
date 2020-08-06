@@ -3,7 +3,7 @@ package storage
 import (
 	"sync"
 
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
+	"github.com/hosseio/ride-fare-estimator-exercise/internal"
 )
 
 type InMemoryRideRepository struct {

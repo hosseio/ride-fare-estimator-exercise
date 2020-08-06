@@ -3,10 +3,11 @@
 package storage
 
 import (
-	"github.com/stretchr/testify/require"
-	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal"
 	"testing"
 	"time"
+
+	"github.com/hosseio/ride-fare-estimator-exercise/internal"
+	"github.com/stretchr/testify/require"
 )
 
 func TestInMemoryRideRepository(t *testing.T) {
