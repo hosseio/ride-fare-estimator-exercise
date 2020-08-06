@@ -2,11 +2,11 @@ package io
 
 import (
 	"context"
+	"log"
+
 	cromberbus "github.com/chiguirez/cromberbus/v2"
 	"gitlab.emobg.tech/go/one-connected-fleet/Collision/internal/creator"
 	"golang.org/x/sync/errgroup"
-	"sync/atomic"
-	"time"
 )
 
 type Controller struct {
@@ -23,11 +23,9 @@ func (c Controller) Start(ctx context.Context) error {
 
 	for _, ch := range c.demuxer.inputs {
 		g.Go(func() error {
-			keepOn := true
-			for keepOn {
+			for {
 				select {
 				case <-gCtx.Done():
-					keepOn = false
 					break
 				case position := <-ch:
 					err := c.bus.Dispatch(creator.CreatePositionCommand{
@@ -36,8 +34,11 @@ func (c Controller) Start(ctx context.Context) error {
 						Lon:       position.Lon,
 						Timestamp: position.Timestamp,
 					})
+
+					log.Printf("error creating position: %s", err.Error())
 				}
 			}
+
 			return nil
 		})
 	}

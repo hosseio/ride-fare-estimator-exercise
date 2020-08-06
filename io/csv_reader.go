@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/csv"
+	"errors"
 	"io"
 	"log"
 	"os"
@@ -51,10 +52,7 @@ func (r CSVReader) Read(ctx context.Context) error {
 		default:
 			line, err = reader.Read()
 			if err != nil {
-				switch err {
-				case io.EOF:
-					log.Println("the end of the file has been achieved")
-				default:
+				if !errors.Is(io.EOF, err) {
 					log.Printf("error reading the csv file: %s", err.Error())
 				}
 				break
