@@ -18,8 +18,8 @@ func NewInMemory() *InMemory {
 }
 
 func (r *InMemory) Get(id int) (internal.Ride, error) {
-	r.RLock()
-	defer r.RUnlock()
+	r.Lock()
+	defer r.Unlock()
 	ride := r.rides[id]
 
 	if ride.ID() == 0 { // zero value (invalid)
@@ -30,8 +30,8 @@ func (r *InMemory) Get(id int) (internal.Ride, error) {
 }
 
 func (r *InMemory) Save(ride internal.Ride) error {
-	r.RLock()
-	defer r.RUnlock()
+	r.Lock()
+	defer r.Unlock()
 
 	r.rides[ride.ID()] = ride
 
@@ -39,8 +39,8 @@ func (r *InMemory) Save(ride internal.Ride) error {
 }
 
 func (r *InMemory) All() ([]internal.Ride, error) {
-	r.RLock()
-	defer r.RUnlock()
+	r.Lock()
+	defer r.Unlock()
 
 	var rides []internal.Ride
 	for _, r := range r.rides {

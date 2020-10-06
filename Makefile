@@ -20,7 +20,7 @@ install:
 	go mod tidy
 
 test:
-	go test -tags=integration,e2e ./... -v
+	go test -race -tags=integration,e2e ./... -v
 
 run:
 	go run ./cmd/fare-estimator/main.go
